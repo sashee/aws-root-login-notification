@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  SNSTopic:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      DisplayName: "Root sign in"
+  EventRule:
+    Type: "AWS::Events::Rule"
+    Properties:
+      State: ENABLED
+      EventPattern:
+        detail-type:
+          - AWS Console Sign In via CloudTrail
+        detail:
+          userIdentity:
+            type:
+              - Root
+      Targets:
+        - Arn: !Ref SNSTopic
+          Id: notification
+  TopicPolicy:
+    Type: "AWS::SNS::TopicPolicy"
+    Properties:
+      Topics:
+        - !Ref SNSTopic
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action:
+              - "sns:Publish"
+            Resource: !Ref SNSTopic
+Outputs:
+  SNSTopic:
+    Value: !Ref SNSTopic
