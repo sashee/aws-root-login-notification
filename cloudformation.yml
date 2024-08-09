@@ -1,9 +1,9 @@
 AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  SNSTopicArn:
+    Description: "ARN of SNS topic to send the notification to"
+    Type: String
 Resources:
-  SNSTopic:
-    Type: "AWS::SNS::Topic"
-    Properties:
-      DisplayName: "Root sign in"
   EventRule:
     Type: "AWS::Events::Rule"
     Properties:
@@ -16,22 +16,5 @@ Resources:
             type:
               - Root
       Targets:
-        - Arn: !Ref SNSTopic
+        - Arn: !Ref SNSTopicArn
           Id: notification
-  TopicPolicy:
-    Type: "AWS::SNS::TopicPolicy"
-    Properties:
-      Topics:
-        - !Ref SNSTopic
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: events.amazonaws.com
-            Action:
-              - "sns:Publish"
-            Resource: !Ref SNSTopic
-Outputs:
-  SNSTopic:
-    Value: !Ref SNSTopic
